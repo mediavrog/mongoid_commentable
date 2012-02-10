@@ -1,12 +1,12 @@
 module Mongoid::Commentable
   extend ActiveSupport::Concern
+  
   included do |base|
     base.embeds_many :comments, :as => :commentable
     base.index [['comments', Mongo::ASCENDING]]
   end
     
   module ClassMethods
-  
     def commentable?
       true
     end
@@ -20,7 +20,7 @@ module Mongoid::Commentable
 
   def comments_list(sort=:asc, page=1, limit=10)
     if Comment.respond_to?(sort)
-      comments.send(sort,:created_at).limit(limit).skip( (page - 1)*limit )
+      comments.send(:order_by, :created_at, sort).limit(limit).skip( (page - 1)*limit )
     else
       raise ArgumentError, "Wrong argument!"
     end
